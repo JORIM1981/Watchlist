@@ -53,6 +53,15 @@ class Review:
 
         return response
 
+
+class PhotoProfile(db.Model):
+    __tablename__ = 'profile_photos'
+
+    id = db.Column(db.Integer,primary_key = True)
+    pic_path = db.Column(db.String())
+    user_id = db.Column(db.Integer,db.ForeignKey("users.id"))
+
+
 class User(UserMixin,db.Model):
     __tablename__ = 'users'
 
@@ -64,6 +73,7 @@ class User(UserMixin,db.Model):
     bio = db.Column(db.String(255))
     profile_pic_path = db.Column(db.String())
     password_hash = db.Column(db.String(255))
+    photos = db.relationship('PhotoProfile',backref = 'user',lazy = "dynamic")
     reviews = db.relationship('Review',backref = 'user',lazy = "dynamic")
 
     @property
@@ -72,11 +82,11 @@ class User(UserMixin,db.Model):
 
     @password.setter
     def password(self, password):
-        self.pass_secure = generate_password_hash(password)
+        self.pass_hash = generate_password_hash(password)
 
 
     def verify_password(self,password):
-        return check_password_hash(self.pass_secure,password)
+        return check_password_hash(self.pass_hash,password)
 
     def __repr__(self):
         return f'User {self.username}'   
@@ -105,6 +115,7 @@ class Review(db.Model):
     posted = db.Column(db.DateTime,default=datetime.utcnow)
     user_id = db.Column(db.Integer,db.ForeignKey("users.id"))
 
+
     def save_review(self):
         db.session.add(self)
         db.session.commit()
@@ -113,5 +124,7 @@ class Review(db.Model):
     def get_reviews(cls,id):
         reviews = Review.query.filter_by(movie_id=id).all()
         return reviews
+
+    
 
 
