@@ -72,7 +72,7 @@ class User(UserMixin,db.Model):
     role_id = db.Column(db.Integer,db.ForeignKey('roles.id'))
     bio = db.Column(db.String(255))
     profile_pic_path = db.Column(db.String())
-    password_hash = db.Column(db.String(255))
+    password_hash = db.Column(db.String(255),nullable = False)
     photos = db.relationship('PhotoProfile',backref = 'user',lazy = "dynamic")
     reviews = db.relationship('Review',backref = 'user',lazy = "dynamic")
 
@@ -86,6 +86,7 @@ class User(UserMixin,db.Model):
 
 
     def verify_password(self,password):
+       # import pdb; pdb.set_trace()
         return check_password_hash(self.password_hash,password)
 
     def __repr__(self):
